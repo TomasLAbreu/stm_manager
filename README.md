@@ -9,7 +9,7 @@ Software for interfacing with STM32F767ZI-NUCLEO. Contains a reduced list of com
 - MATLAB R2019a: digital filter generation
 
 ## List of commands
-For extended information, please read [command syntax doc](https://github.com/ESRGgroup9/stm_manager/blob/main/doc/command_syntax.pdf).
+For extended information, please read [command syntax doc](https://github.com/ESRGgroup9/stm_manager/blob/main/doc/command_syntax.pdf) (currently in Portuguese).
 ### List of utils:
 |Util|    Util functionallity|
 |---|---------------------|
