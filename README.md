@@ -8,6 +8,13 @@ Software for interfacing with STM32F767ZI-NUCLEO. Contains a reduced list of com
 - PuTTY: interface STM via UART
 - MATLAB R2019a: digital filter generation
 
+## Project tree
+- `doc/`: documentation
+- `matlab/`: digital filter design files
+- `stm_manager/`: CubeIDE project dir
+  -  `core/Inc/`: include files
+  -  `core/Src/`: source files
+
 ## List of commands
 For extended information, please read [command syntax doc](https://github.com/ESRGgroup9/stm_manager/blob/main/doc/command_syntax.pdf) (currently in Portuguese).
 ### List of utils:
