@@ -41,13 +41,13 @@ const Command_t cmd_list[] =
 	},
 	{	
 		"MI",
-		"Memory Make Input",
+		"Make Input",
 		"MI <port_addr8> <pin_setting16>",
 		mi_cb
 	},	
 	{
 		"MO",
-		"Memory Make Output",
+		"Make Output",
 		"MO <port_addr8> <pin_setting16>",
 		mo_cb
 	},

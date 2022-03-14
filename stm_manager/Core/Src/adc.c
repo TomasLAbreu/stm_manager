@@ -221,7 +221,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 	
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, (GPIO_PinState) 1);
 	
-	//HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0); //#debug
+	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0); //#debug
 	if(hadc->Instance == ADC1)
 	{
 		adcValue = HAL_ADC_GetValue(&hadc1);
