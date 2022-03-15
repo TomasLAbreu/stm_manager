@@ -219,16 +219,18 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
 	static float y;
 	
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, (GPIO_PinState) 1);
+//	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, (GPIO_PinState) 1);
 	
 	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0); //#debug
 	if(hadc->Instance == ADC1)
 	{
 		adcValue = HAL_ADC_GetValue(&hadc1);
 		smps_left--;
-		
+
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, (GPIO_PinState) 1);
 		// apply selected filter
 		y = filter_calc(&f, adcValue);
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, (GPIO_PinState) 0);
 
 		if(y == -1) // is filter disabled?
 			// Add new value to buffer
@@ -243,7 +245,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 			output(y);
 		}
 		
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, (GPIO_PinState) 0);
+//		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, (GPIO_PinState) 0);
 		//adcFlag = 1;
 	}
 }

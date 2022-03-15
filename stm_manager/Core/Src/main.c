@@ -111,10 +111,16 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	 
+	{
+		exec_cmd("MO 1 1");
+		exec_cmd("WG sin 32");
+		exec_cmd("SP ms 1");
+		exec_cmd("S");
+	}
+
 	UART_putchar('>'); // print prompt
 	Rx_UART_init(); // set USART3 interrupt
-  
+
 	while (1)
   {
 		if(Rx_flag)
