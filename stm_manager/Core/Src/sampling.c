@@ -164,26 +164,26 @@ char fn_cb(uint8_t argc, char** argv)
 		f.y_coefs = FIR_y_coefs;
 		UART_puts("Selected Low-Pass Filter.\n\r");
 	}
-	else if(strcmp(argv[1], "HP") == 0)
-	{
-		// set High Pass filter
-		f.M = FIR_HP_M_;
-		f.N = 0;
-		f.dc = 4095/2;
-		f.x_coefs = FIR_HP_x_coefs;
-		f.y_coefs = FIR_y_coefs;
-		UART_puts("Selected High-Pass Filter.\n\r");
-	}
-	else if(strcmp(argv[1], "BP") == 0)
-	{
-		// set Band Pass filter
-		f.M = FIR_BP_M_;
-		f.N = 0;
-		f.dc = 4095/2;
-		f.x_coefs = FIR_BP_x_coefs;
-		f.y_coefs = FIR_y_coefs;
-		UART_puts("Selected Band-Pass Filter.\n\r");
-	}
+//	else if(strcmp(argv[1], "HP") == 0)
+//	{
+//		// set High Pass filter
+//		f.M = FIR_HP_M_;
+//		f.N = 0;
+//		f.dc = 4095/2;
+//		f.x_coefs = FIR_HP_x_coefs;
+//		f.y_coefs = FIR_y_coefs;
+//		UART_puts("Selected High-Pass Filter.\n\r");
+//	}
+//	else if(strcmp(argv[1], "BP") == 0)
+//	{
+//		// set Band Pass filter
+//		f.M = FIR_BP_M_;
+//		f.N = 0;
+//		f.dc = 4095/2;
+//		f.x_coefs = FIR_BP_x_coefs;
+//		f.y_coefs = FIR_y_coefs;
+//		UART_puts("Selected Band-Pass Filter.\n\r");
+//	}
 	else
 	{
 		UART_puts("Filter not recognized.\n\r");

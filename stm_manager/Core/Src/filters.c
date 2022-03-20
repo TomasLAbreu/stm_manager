@@ -41,17 +41,37 @@ Filter types implemented are:
 @brief	 	 Enables filter
 @retval 	 Filter state
 ******************************************************************************/
+//char filter_init(filter_t *ft)
+//{
+//	if(!ft || ft->status)	// filter enabled?
+//		// Filter already initialized
+//		return (char)(-1);
+//
+//	ft->x_ant = (float*)malloc(ft->M + 1);
+//	if(!ft->x_ant)
+//		return (char)(-1);
+//
+//	ft->y_ant = (float*)malloc(ft->N + 1);
+//	if(!ft->y_ant)
+//		return (char)(-1);
+//
+//	memset(ft->x_ant, 0, (ft->M + 1)*sizeof(ft->x_ant[0])); 	// clear the x_ant buff
+//	memset(ft->y_ant, 0, (ft->N + 1)*sizeof(ft->y_ant[0]));	// clear the y_ant buff
+//	ft->status = 1; // enabled
+//	// Exit success
+//	return 0;
+//}
 char filter_init(filter_t *ft)
 {
 	if(!ft || ft->status)	// filter enabled?
 		// Filter already initialized
 		return (char)(-1);
 	
-	ft->x_ant = (float*)malloc(ft->M + 1);
+	ft->x_ant = (fixed_point_t*)malloc(ft->M + 1);
 	if(!ft->x_ant)
 		return (char)(-1);
 
-	ft->y_ant = (float*)malloc(ft->N + 1);
+	ft->y_ant = (fixed_point_t*)malloc(ft->N + 1);
 	if(!ft->y_ant)
 		return (char)(-1);
 
@@ -61,7 +81,6 @@ char filter_init(filter_t *ft)
 	// Exit success
 	return 0; 
 }
-
 /******************************************************************************
 @function  Filter Kill
 @param		 none
@@ -102,13 +121,56 @@ char filter_kill(filter_t *ft)
 
 #ifdef __CASE_A__
 
-float filter_calc(filter_t *ft, uint32_t x)
+//float filter_calc(filter_t *ft, uint32_t x)
+//{
+//	if(!ft || ft->status == 0)
+//		// Filter is disabled. Return error
+//		return -1;
+//
+//	float y = 0;
+//	int i = ft->M;
+//
+//	while(i != 0)
+//	{
+//		// Update x_ant values
+//		ft->x_ant[i] = ft->x_ant[i-1];
+//		// Add to y only the x_ant values
+//		y += ft->x_coefs[i] * ft->x_ant[i];
+//		i--;
+//	}
+//	// Update last received X value
+//	ft->x_ant[0] = x;
+//	// Add it to y
+//	y += ft->x_coefs[i] * ft->x_ant[i];
+//
+//	i = ft->N;
+//	while (i != 0)
+//	{
+//		// Update y_ant values
+//		ft->y_ant[i] = ft->y_ant[i-1];
+//		// Add to y only the y_ant values
+//		y += ft->y_coefs[i] * ft->y_ant[i];
+//		i--;
+//	}
+//	// Update last Y value = x
+//	ft->y_ant[0] = y;
+//	// Add it to y
+//	y += ft->y_coefs[i] * ft->y_ant[i];
+//
+//	// add dc component
+//	y += ft->dc;
+//
+//	// Return filtered (x) value
+//	return y;
+//}
+
+int filter_calc(filter_t *ft, fixed_point_t x)
 {
 	if(!ft || ft->status == 0)
 		// Filter is disabled. Return error
 		return -1;
-	
-	float y = 0;
+
+	int y = 0;
 	int i = ft->M;
 
 	while(i != 0)
@@ -121,9 +183,9 @@ float filter_calc(filter_t *ft, uint32_t x)
 	}
 	// Update last received X value
 	ft->x_ant[0] = x;
-	// Add it to y	
+	// Add it to y
 	y += ft->x_coefs[i] * ft->x_ant[i];
-	
+
 	i = ft->N;
 	while (i != 0)
 	{
@@ -137,7 +199,7 @@ float filter_calc(filter_t *ft, uint32_t x)
 	ft->y_ant[0] = y;
 	// Add it to y
 	y += ft->y_coefs[i] * ft->y_ant[i];
-	
+
 	// add dc component
 	y += ft->dc;
 

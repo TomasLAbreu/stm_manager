@@ -26,6 +26,7 @@
 #include "dac.h"
 
 #include <stdio.h>
+#include <math.h>
 
 #define ADC_VALUES_LEN 32
 
@@ -217,7 +218,8 @@ uint32_t ADC_Polling_Conv(ADC_HandleTypeDef* hadc)
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
-	static float y;
+//	static float y;
+	static uint32_t y;
 	
 //	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, (GPIO_PinState) 1);
 	
@@ -232,15 +234,17 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 		y = filter_calc(&f, adcValue);
 		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, (GPIO_PinState) 0);
 
+		y *= pow(2, -15);
+
 		if(y == -1) // is filter disabled?
 			// Add new value to buffer
 			output(adcValue);
 		else
 		{
-				if(y > 4095)  // larger than max digital DAC value?
-					// send max value
-					y = 4095;
-			
+			if(y > 4095)  // larger than max digital DAC value?
+				// send max value
+				y = 4095;
+
 			// Add filtered value to buffer
 			output(y);
 		}
