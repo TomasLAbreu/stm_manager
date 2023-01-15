@@ -103,6 +103,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // print startup message
+  UART_puts("\e[1;1H\e[2J");
   ver_cb(1, NULL);
   UART_puts("\n\rType '?' for list of available commands\n\r");
   UART_puts("Type '? <cmd>' for more info on a given command\n\r");
@@ -111,12 +112,12 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	{
-		exec_cmd("MO 1 1");
-		exec_cmd("WG sin 32");
-		exec_cmd("SP ms 1");
-		exec_cmd("S");
-	}
+	// {
+	// 	exec_cmd("MO 1 1");
+	// 	exec_cmd("WG sin 32");
+	// 	exec_cmd("SP ms 1");
+	// 	exec_cmd("S");
+	// }
 
 	UART_putchar('>'); // print prompt
 	Rx_UART_init(); // set USART3 interrupt
@@ -132,18 +133,18 @@ int main(void)
 
 			Rx_flag = 0;
 		}
-		
+
 		if(cmd_received)
 		{
 			if(exec_cmd(Rx_Buffer) == 0)// Is there an error?
 				// No error. Command is valid
 				strcpy(last_valid_cmd, Rx_Buffer); // Save this as last valid command
-			
+
 			UART_putchar('>');// print prompt
 			cmd_received = 0;
 			Rx_UART_init(); // ready to begin reception
 		}
-		
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

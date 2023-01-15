@@ -7,26 +7,26 @@
 	Analyses the command sent in str_in and execute its callback
 */
 char parse_cmd(const Command_t cmd_list[], const char *str_in)
-{		
+{
 	char **argv = NULL; // List of arguments
 	char *arg; // aux variable. Holds latest found argument
 	char *s; // copy of received command. Necessary to use strtok
-	
+
 	uint8_t len;
 	uint8_t argc = 0;
 	char retval = (char)(-ECMDNF);
-	
+
 	if ((str_in == NULL) || (strlen(str_in) == 0)) // empty command
 		return (char)(-ENOCMD);
 	//if (cmd_list == NULL) // no list
-		//return (-ENOLIST);   
+		//return (-ENOLIST);
 
 	len = strlen(str_in) + 1;
 	s = malloc(len);                 // just in case str_in is const
-	
+
 	if(s == NULL)
 		return (char)(-ENOMEM);
-	
+
 	strcpy(s, str_in);
 	arg = strtok(s, DELIMETER);
 	while (arg)

@@ -4,7 +4,7 @@
 
 // Callbacks Includes
 #include "interface.h"
-#include "sampling.h"
+// #include "sampling.h"
 
 /******************************************************************************
 @name			cmd_list
@@ -13,38 +13,38 @@
 					- Command help text
 					- Command callback function
 ******************************************************************************/
-const Command_t cmd_list[] = 
+const Command_t cmd_list[] =
 {
-	{ 
+	{
 		"?",
 		"Help information",
 		"Display extended information on a given command\n\r? <cmd>",
-		help_cb 
+		help_cb
 	},
-	{ 
+	{
 		"VER",
 		"Display firmware version",
 		"",
 		ver_cb
 	},
-	{ 
+	{
 		"MR",
 		"Memory Read",
 		"MR <addr16> <length8>",
-		mr_cb 
+		mr_cb
 	},
-	{	
-		"MW",	
+	{
+		"MW",
 		"Memory Write",
 		"MW <addr16> <length8> <byte8>",
-		mw_cb 
+		mw_cb
 	},
-	{	
+	{
 		"MI",
 		"Make Input",
 		"MI <port_addr8> <pin_setting16>",
 		mi_cb
-	},	
+	},
 	{
 		"MO",
 		"Make Output",
@@ -62,55 +62,55 @@ const Command_t cmd_list[] =
 		"Write Digital Pin",
 		"WD <port_addr8> <pin_setting16> <pin_values8>",
 		wd_cb
-	},	
+	},
 	{
 		"RA",
 		"Read Analog",
 		"RA <addr4>",
 		ra_cb
 	},
-	{
-		"SP",
-		"Sampling Period",
-		"SP <timeScale> <timeVal>\n\r  <timeScale>: s - seconds; ms - milissecs.; micro - microsecs.\n\r  <timeVal>: hex value",
-		sp_cb
-	},
-	{
-		"AC",
-		"Analog Channel",
-		"AC <adcCHnum>",
-		ac_cb
-	},
-	{
-		"FN",
-		"Filter ON",
-		"FN <filter>\n\r  <filter>: LP - low pass; HP - high pass; BP - band pass",
-		fn_cb
-	},
-	{
-		"FF",
-		"Filter OFF",
-		"",
-		ff_cb
-	},
-	{
-		"S",
-		"Sample",
-		"S [<k>]\n\r\t<k> Sample k values",
-		s_cb
-	},
-	{
-		"ST",
-		"Stop Sampling",
-		"",
-		st_cb
-	},
-	{
-		"WG",
-		"Wave Generator",
-		"WG <wave> <freq>\n\r  <wave>: sqr - square; sin - sine; tri - triangular\n\r  <freq>: hex value, in Hz. Max 0x64 = 100hz",
-		wg_cb
-	},
+	// {
+	// 	"SP",
+	// 	"Sampling Period",
+	// 	"SP <timeScale> <timeVal>\n\r  <timeScale>: s - seconds; ms - milissecs.; micro - microsecs.\n\r  <timeVal>: hex value",
+	// 	sp_cb
+	// },
+	// {
+	// 	"AC",
+	// 	"Analog Channel",
+	// 	"AC <adcCHnum>",
+	// 	ac_cb
+	// },
+	// {
+	// 	"FN",
+	// 	"Filter ON",
+	// 	"FN <filter>\n\r  <filter>: LP - low pass; HP - high pass; BP - band pass",
+	// 	fn_cb
+	// },
+	// {
+	// 	"FF",
+	// 	"Filter OFF",
+	// 	"",
+	// 	ff_cb
+	// },
+	// {
+	// 	"S",
+	// 	"Sample",
+	// 	"S [<k>]\n\r\t<k> Sample k values",
+	// 	s_cb
+	// },
+	// {
+	// 	"ST",
+	// 	"Stop Sampling",
+	// 	"",
+	// 	st_cb
+	// },
+	// {
+	// 	"WG",
+	// 	"Wave Generator",
+	// 	"WG <wave> <freq>\n\r  <wave>: sqr - square; sin - sine; tri - triangular\n\r  <freq>: hex value, in Hz. Max 0x64 = 100hz",
+	// 	wg_cb
+	// },
 	{ //end of Command list
 		0,
 		0,
@@ -121,9 +121,9 @@ const Command_t cmd_list[] =
 char exec_cmd(const char *str)
 {
 	char err;
-	
+
 	err = parse_cmd(cmd_list, str);
-	
+
 	switch(err)
 	{
 		case (char)(-ECMDNF):
@@ -132,12 +132,12 @@ char exec_cmd(const char *str)
 			UART_puts(Rx_Buffer);
 			UART_puts("] not found.\n\r");
 			break;
-		
+
 		case (char)(-EINVARG):
 			// Invalid Arguments
 			UART_puts("Invalid arguments.\n\r");
 			break;
-		
+
 		case (char)(-ENOCMD):
 			// Command is empty
 		case (char)(-ENOMEM):
@@ -149,7 +149,7 @@ char exec_cmd(const char *str)
 			UART_puts("No permission.\n\r");
 			break;
 	}
-	
+
 	return err;
 }
 
@@ -192,10 +192,10 @@ char help_cb(uint8_t argc, char** argv)
 	char str[128]; // Output message. Max message len is the same as buffer used in UART_puts
 	char (*fun_ptr)(const Command_t *, char*) = &print_full_help;
 	char retval = 0;
-	
+
 	if(argc > 2) // number of arguments invalid?
 		return (char)(-EINVARG);
-	
+
 	if(argc == 2)
 	{
 		fun_ptr = &print_arg_help;

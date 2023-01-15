@@ -41,7 +41,8 @@ extern UART_HandleTypeDef huart3;
 #define TX_BUFF_LEN 256
 
 #define ENTER_KEY 	0x0D
-#define BCKSP_KEY 	0x7F
+// #define BCKSP_KEY 	0x7F
+#define BCKSP_KEY   0x08
 #define ESC_KEY 		0x1B
 #define DOLLAR_KEY 	0x24
 

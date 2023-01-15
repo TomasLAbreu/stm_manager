@@ -145,13 +145,13 @@ char UART_Receive(void)
 	if(Rx_index == (RX_BUFF_LEN - 1)) // Is the buffer full?
 		// Treat as 'CR'
 		c = ENTER_KEY;
-	
+
 	if(c != ENTER_KEY) // Is this the end of reception?
 		Rx_UART_init(); // prepare for next character
-	
+
 	if(process_as_control() == 0) // Is the received char a control char?
 		return (char)(-1);
-	
+
 	// Its not a special character
 	process_as_data();
 	return c;
@@ -169,7 +169,7 @@ typedef struct Special_Key {
 } Special_Key_t;
 
 // List of special keys codes and callbacks
-const Special_Key_t s_key_list[] = 
+const Special_Key_t s_key_list[] =
 {
 	{ENTER_KEY	, enter_key_cb	},
 	{BCKSP_KEY	, bcksp_key_cb	},
@@ -179,20 +179,20 @@ const Special_Key_t s_key_list[] =
 //	{UP_ARROW_KEY		, dollar_key_cb},
 //	{RIGHT_ARROW_KEY, right_key_cb},
 //	{DOWN_ARROW_KEY	, down_key_cb},
-	
+
 	{0,0}
 };
 
 static char process_as_control(void)
 {
 	const Special_Key_t *s_key_ptr = s_key_list;
-	
+
 	while(s_key_ptr->code)
 	{
 		if(c == (s_key_ptr->code))// Is this a control char?
 		{
 			// Execute this control char callback
-			s_key_ptr->fn();	
+			s_key_ptr->fn();
 			return 0; // processed as control
 		}
 		s_key_ptr++;
@@ -213,11 +213,15 @@ static void enter_key_cb(void)
 static void bcksp_key_cb(void)
 {
 	if(Rx_index > 0) // Is there characters left to delete?
+	{
 		Rx_index--;
 		// c is equal to BCKSP_KEY
+	}
 	else
+	{
 		// Nothing to delete
 		c = 0; // Print nothing
+	}
 	UART_putchar(c);
 }
 
@@ -273,13 +277,13 @@ static void clear_last_cmd(void)
 {
 	if(Rx_index == 0) // empty buffer
 		return;
-	
+
 	// fill Rx_Buffer with 'BCKSP_KEY'
 	memset(Rx_Buffer, BCKSP_KEY, Rx_index);
 	Rx_Buffer[Rx_index] = 0; 	// mark end of string
 	Rx_index = 0;
-	
-	UART_puts(Rx_Buffer); // print it -> this will clear the command line 
+
+	UART_puts(Rx_Buffer); // print it -> this will clear the command line
 }
 
 /******************************************************************************
@@ -291,11 +295,11 @@ static void insert_cmd(const char* str)
 {
 	if((str == NULL) || (str[0] == 0))
 		return;
-	
+
 	int len = strlen(str);
 	if(len > RX_BUFF_LEN)
 		return;
-	
+
 	strcpy(Rx_Buffer, str);
 	Rx_index = strlen(str);	// 'Rx_index' point to the last 'Rx_Buffer' position
 }
@@ -321,7 +325,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart)
 //}
 
 /******************************************************************************
-@brief	 	 Sends a char by UART - Polling (Waits for UART_Tx to transmitt 
+@brief	 	 Sends a char by UART - Polling (Waits for UART_Tx to transmitt
 							queued data
 @param  	 Char to be transmitted
 ******************************************************************************/
@@ -329,13 +333,13 @@ void UART_putchar(char ch)
 {
 	while(huart3.gState == HAL_UART_STATE_BUSY_TX) // Waits for UART_Tx to transmitt queued data
 		;
-	
+
 	c = ch; // 'ch' cannot be used to transmitt since its local to this function. Content may be lost
 	HAL_UART_Transmit_IT(&huart3, (uint8_t*)&c, 1);
 }
 
 /******************************************************************************
-@brief	 	 Sends a string by UART - Polling (Waits for UART_Tx to transmitt 
+@brief	 	 Sends a string by UART - Polling (Waits for UART_Tx to transmitt
 							queued data
 @param  	 String to be transmitted
 ******************************************************************************/
@@ -343,14 +347,14 @@ void UART_puts(const char *s)
 {
 	if((s == NULL) || (s[0] == 0))	// string empty?
 		return;
-	
+
 	int len = strlen(s);
 	if(len > TX_BUFF_LEN)		// string size bigger than the max size of Tx_Buffer?
 		return;
 
 	while(huart3.gState == HAL_UART_STATE_BUSY_TX) // Waits for UART_Tx to transmitt queued data
 		;
-	
+
 	strcpy(Tx_Buffer, s);	// send string 'str' to 'TX_Buffer'
 	HAL_UART_Transmit_IT(&huart3, (uint8_t*)Tx_Buffer, len);
 }
@@ -358,10 +362,10 @@ void UART_puts(const char *s)
 //void UART_puts(const char *s)
 //{
 //	const char *ptr = s;
-//	
+//
 //	if((s == NULL) || (s[0] == 0))
 //		return;
-//	
+//
 //	while (*ptr)
 //	{
 //		UART_putchar(*ptr);
