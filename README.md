@@ -1,22 +1,11 @@
 # STM manager
 Software for interfacing with STM32F767ZI-NUCLEO. Contains a reduced list of commands, regarding:
-- User interface with micro controller ([doc](https://github.com/ESRGgroup9/stm_manager/blob/main/doc/LPI2_Guia_PL1_Interface_v4.5.pdf))
-- Digital signal acquisition and filtering ([doc](https://github.com/ESRGgroup9/stm_manager/blob/main/doc/LPI2_Guia_PL2_AquisicaoDeDados_v8.6.pdf))
-
-## Tools
-- STM32CubeIDE 1.6.1
-- PuTTY: interface STM via UART
-- MATLAB R2019a: digital filter generation
-
-## Project tree
-- `doc/`: documentation
-- `matlab/`: digital filter design files
-- `stm_manager/`: CubeIDE project dir
-  -  `core/Inc/`: include files
-  -  `core/Src/`: source files
+- User interface with micro controller ([doc](https://github.com/TomasLAbreu/stm_manager/tree/main/0doc/LPI2_Guia_PL1_Interface_v4.5.pdf))
+- Digital signal acquisition and filtering ([doc](https://github.com/TomasLAbreu/stm_manager/tree/main/0doc/LPI2_Guia_PL2_AquisicaoDeDados_v8.6.pdf))
 
 ## List of commands
-For extended information, please read [command syntax doc](https://github.com/ESRGgroup9/stm_manager/blob/main/doc/command_syntax.pdf) (currently in Portuguese).
+For extended information, please read [command syntax doc](https://github.com/TomasLAbreu/stm_manager/tree/main/0doc/command_syntax.pdf) (currently in Portuguese).
+
 ### List of utils:
 |Util|    Util functionallity|
 |---|---------------------|
@@ -45,7 +34,7 @@ For extended information, please read [command syntax doc](https://github.com/ES
 
 ### Relevant GPIO Pins
 Remember STM32F767ZI GPIO pins mapping:\
-![STM32F767ZI_GPIO_Pins](doc/GPIO_pins.png)
+![STM32F767ZI_GPIO_Pins](0doc/GPIO_pins.png)
 
 Note that, by default the following GPIO pins are assigned:
 |Pin|    Function|
