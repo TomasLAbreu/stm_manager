@@ -5,15 +5,20 @@
 #include "gpio.h"
 #include "adc.h"
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /******************************************************************************
 Private defines
 ******************************************************************************/
-
 // SRAM1: 0x20020000 - 0x2007BFFF (368kB)
-#define SRAM_BASE (uint8_t *)0x20060000		// read and write memory base pointer
-#define SRAM_TOP (uint8_t *)0x2006FFFF		// read and write memory top pointer
+
+// read and write memory base pointer
+#define SRAM_BASE (uint8_t *)0x20060000
+
+// read and write memory top pointer
+#define SRAM_TOP  (uint8_t *)0x2006FFFF
 
 /******************************************************************************
 Function Helpers Prototypes
@@ -34,7 +39,7 @@ char ver_cb(uint8_t argc, char** argv)
 		return (char)(-EINVARG);
 
 	UART_puts("Current version: 2.0\n\rUsing STM32F767ZI-NUCLEO.\n\n\r");
-	UART_puts("Developers:\n\r- Tomas Abreu\n\rJanuary 2023\n\r");
+	UART_puts("Developers:\n\r- Tomas Abreu\n\r- Diogo Fernandes\n\rJanuary 2023\n\r");
 	return 0;
 }
 

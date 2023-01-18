@@ -146,14 +146,15 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 
 /* USER CODE BEGIN 1 */
 
-//void HAL_TIM_PeriodElapsedCallback( TIM_HandleTypeDef * htim )
-//{
+// void HAL_TIM_PeriodElapsedCallback( TIM_HandleTypeDef * htim )
+// {
 //    if(htim->Instance == TIM6)
 //    {
 //    	// toggle LED for heart beat
-//    	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14);
+//    	// HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14);
+//     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
 //    }
-//}
+// }
 
 void TIMER_2_Update(uint32_t reload){
 
@@ -187,7 +188,7 @@ void TIMER_6_Update(uint32_t prescaler, uint32_t period)
 {
   htim6.Init.Prescaler = prescaler - 1;
   htim6.Init.Period = period - 1;
-	
+
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {
     Error_Handler();

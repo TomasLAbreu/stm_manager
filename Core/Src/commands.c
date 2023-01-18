@@ -1,10 +1,12 @@
 #include "commands.h"
 #include "usart.h"
 #include <stdio.h>
+#include <string.h>
 
 // Callbacks Includes
 #include "interface.h"
-// #include "sampling.h"
+#include "cmdline.h"
+#include "sampling.h"
 
 /******************************************************************************
 @name			cmd_list
@@ -69,12 +71,12 @@ const Command_t cmd_list[] =
 		"RA <addr4>",
 		ra_cb
 	},
-	// {
-	// 	"SP",
-	// 	"Sampling Period",
-	// 	"SP <timeScale> <timeVal>\n\r  <timeScale>: s - seconds; ms - milissecs.; micro - microsecs.\n\r  <timeVal>: hex value",
-	// 	sp_cb
-	// },
+	{
+		"SP",
+		"Sampling Period",
+		"SP <timeScale> <timeVal>\n\r  <timeScale>: s - seconds; ms - milissecs.; micro - microsecs.\n\r  <timeVal>: hex value",
+		sp_cb
+	},
 	// {
 	// 	"AC",
 	// 	"Analog Channel",
@@ -93,12 +95,12 @@ const Command_t cmd_list[] =
 	// 	"",
 	// 	ff_cb
 	// },
-	// {
-	// 	"S",
-	// 	"Sample",
-	// 	"S [<k>]\n\r\t<k> Sample k values",
-	// 	s_cb
-	// },
+	{
+		"S",
+		"Sample",
+		"S [<k>]\n\r\t<k> Sample k values",
+		s_cb
+	},
 	// {
 	// 	"ST",
 	// 	"Stop Sampling",

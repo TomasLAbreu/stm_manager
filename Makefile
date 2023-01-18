@@ -12,16 +12,16 @@ CYAN  =\033[0;36m
 RESET =\033[0m
 ################################################################################
 
-BLD_DIR         = ./build
-BIN_DIR         = ./bin
+BLD_DIR         = build
+BIN_DIR         = bin
 
-CORE_SRC_DIR    = ./Core/Src
-CORE_INC_DIR    = ./Core/Inc
+CORE_SRC_DIR    = Core/Src
+CORE_INC_DIR    = Core/Inc
 
-DRIVERS_SRC_DIR = ./Drivers/STM32F7xx_HAL_Driver/Src
-DRIVERS_INC_DIR = ./Drivers/STM32F7xx_HAL_Driver/Inc
+DRIVERS_SRC_DIR = Drivers/STM32F7xx_HAL_Driver/Src
+DRIVERS_INC_DIR = Drivers/STM32F7xx_HAL_Driver/Inc
 
-CMSIS_INC_DIR   = ./Drivers/CMSIS/Device/ST/STM32F7xx/Include/
+CMSIS_INC_DIR   = Drivers/CMSIS/Device/ST/STM32F7xx/Include/
 
 # Startup files
 LDSCRIPT        = STM32F767ZITX_FLASH.ld

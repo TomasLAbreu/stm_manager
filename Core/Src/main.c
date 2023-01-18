@@ -29,6 +29,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <string.h>
+#include "cmdline.h"
 #include "commands.h"
 #include "interface.h" // print startup message
 /* USER CODE END Includes */
@@ -101,23 +102,21 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
+  exec_cmd("MO 1 1");
+  exec_cmd("SP s 1");
+  exec_cmd("S");
+  // TIMER_6_Update(60000, 1800);
 
   // print startup message
   UART_puts("\e[1;1H\e[2J");
-  ver_cb(1, NULL);
+  // ver_cb(1, NULL);
   UART_puts("\n\rType '?' for list of available commands\n\r");
-  UART_puts("Type '? <cmd>' for more info on a given command\n\r");
+  // UART_puts("Type '? <cmd>' for more info on a given command\n\r");
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	// {
-	// 	exec_cmd("MO 1 1");
-	// 	exec_cmd("WG sin 32");
-	// 	exec_cmd("SP ms 1");
-	// 	exec_cmd("S");
-	// }
 
 	UART_putchar('>'); // print prompt
 	Rx_UART_init(); // set USART3 interrupt
@@ -132,17 +131,18 @@ int main(void)
 				UART_putchar(c); // Received char is echoed
 
 			Rx_flag = 0;
+      Rx_UART_init();
 		}
 
 		if(cmd_received)
 		{
-			if(exec_cmd(Rx_Buffer) == 0)// Is there an error?
-				// No error. Command is valid
-				strcpy(last_valid_cmd, Rx_Buffer); // Save this as last valid command
+		// 	if(exec_cmd(Rx_Buffer) == 0)// Is there an error?
+		// 		// No error. Command is valid
+		// 		strcpy(last_valid_cmd, Rx_Buffer); // Save this as last valid command
 
 			UART_putchar('>');// print prompt
 			cmd_received = 0;
-			Rx_UART_init(); // ready to begin reception
+			Rx_UART_init(); // >>>>>>> needed?? is inside UART_Receive
 		}
 
     /* USER CODE END WHILE */

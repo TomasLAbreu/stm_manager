@@ -10,6 +10,8 @@
 #include "adc.h"
 #include "usart.h" // Using Uart_puts
 #include "tim.h"
+#include <stdio.h>
+#include <string.h>
 
 /******************************************************************************
 Global Variables
@@ -42,7 +44,7 @@ const char* timeunits_arr[] =
 	"s"
 };
 
-/* Fill timer parameters: 
+/* Fill timer parameters:
 	Prescaler (PSC)
 	Counter Period (Period)
 
@@ -54,12 +56,12 @@ const uint16_t timer_reloads[3][2] =
 	// (PSC-1) 		= 54
 	// (Period-1) = 2
 	{54	, 2 },
-	
+
 	// 1kHz 			= 108Mhz / (54000 * 2)
 	// (PSC-1) 		= 54000
 	// (Period-1) = 2
 	{54000, 2 },
-	
+
 	// 1Hz 				= 108Mhz / (60000 * 1800)
 	// (PSC-1) 		= 60000
 	// (Period-1) = 1800
@@ -73,14 +75,14 @@ char sp_cb(uint8_t argc, char** argv)
 	uint8_t timeunits_arr_len;
 	uint8_t retval = (char)(-EINVARG);
 	char str[40];
-	
+
 	if(argc != 3) // number of arguments invalid?
 		return (char)(-EINVARG);
-	
+
 	units = my_atoi(argv[2]);
 	if((units == 0) || (!IS_ADDR16(units)))
 		return (char)(-EINVARG);
-	
+
 	// get number of valid <timeunits>
 	timeunits_arr_len = (sizeof(timeunits_arr) / sizeof(timeunits_arr[0]));
 	// Check if <timeunit> is valid
@@ -98,7 +100,7 @@ char sp_cb(uint8_t argc, char** argv)
 			break;
 		}
 	}
-	
+
 	// If <timeunit> was not found, retval equals (-EINVARG)
 	return retval;
 }
@@ -114,10 +116,10 @@ char ac_cb(uint8_t argc, char** argv)
 {
 	uint8_t addr;
 	char str[62];
-	
+
 	if(argc != 2) // number of arguments invalid?
 		return (char)(-EINVARG);
-	
+
 	addr = my_atoi(argv[1]);
 	if(!IS_ADDR4(addr))
 		return (char)(-EINVARG);
@@ -128,10 +130,10 @@ char ac_cb(uint8_t argc, char** argv)
 		UART_puts("Pin not configured as input mode.\n\r");	// not able to read pin value
 		return (char)(-EPERM);
 	}
-	
+
 	snprintf(str, sizeof(str), "ADC Channel %d selected for sampling.\n\r", addr);
 	UART_puts(str);
-	
+
 	return 0;
 }
 
@@ -146,7 +148,7 @@ char fn_cb(uint8_t argc, char** argv)
 {
 	if(argc != 2) // number of arguments invalid?
 		return (char)(-EINVARG);
-	
+
 	if(f.status == 1)
 	{
 		UART_puts("Filter already enabled.\n\r");
@@ -196,7 +198,7 @@ char fn_cb(uint8_t argc, char** argv)
 		UART_puts("Error initializing filter.\n\r");
 		return 0;
 	}
-	
+
 	// Filter enabled
 	UART_puts("Filter ON.\n\r");
 	return 0;
@@ -213,13 +215,13 @@ char ff_cb(uint8_t argc, char** argv)
 {
 	if(argc != 1) // number of arguments invalid?
 		return (char)(-EINVARG);
-		
+
 	if(filter_kill(&f) == (char)(-1)) // Filter has already been disabled?
 	{
 		UART_puts("Filter already disabled.\n\r");
 		return 0;
 	}
-	
+
 	// Filter disabled
 	UART_puts("Filter OFF.\n\r");
 	return 0;
@@ -229,7 +231,7 @@ char ff_cb(uint8_t argc, char** argv)
 @function  Sample / Sample K values
 @usage		 S </dig>
 
-@brief	 	 Begin sampling. Number of samples to be taken is optional. It can 
+@brief	 	 Begin sampling. Number of samples to be taken is optional. It can
 					 be defined by <dig>
 ******************************************************************************/
 
@@ -254,22 +256,22 @@ static void stop_sampling(void)
 char s_cb(uint8_t argc, char** argv)
 {
 	char str[32];
-	
+
 	if(argc > 2) // number of arguments invalid?
 		return (char)(-EINVARG);
-	
+
 	if(Sampling_flag == 1) // sampling in progress?
 	{
 		UART_puts("Sampling already in progress.\n\r");
 		return 0;
 	}
-	
+
 	if(SP_cb_done == 0) // sampling period defined?
 	{
 		UART_puts("Sampling period not defined.\n\r");
 		return (char) (-EPERM);
 	}
-	
+
 	if(argc == 1)
 	{
 		// Begin infinite sampling
@@ -281,24 +283,24 @@ char s_cb(uint8_t argc, char** argv)
 		Sampling_flag = 1;
 		return 0;
 	}
-	
+
 	// Else, argument 1 defines number of samples to be taken
 	smps_left = my_atoi(argv[1]);
 	if(!IS_DIG(smps_left))
 		return (char)(-EINVARG);
-	
+
 	// Begin sampling K values
 	sprintf(str, "Sampling %d values...\n\r", smps_left);
 	UART_puts(str);
-	
+
 	start_sampling(); // Start taking samples
 	while (smps_left) // Taking samples
 		;
 	stop_sampling(); 	// Stop taking samples
-	
+
 	UART_puts("Sampled values:\n\r");
 	print_adcValues();
-	
+
 	return 0;
 }
 
@@ -313,16 +315,16 @@ char st_cb(uint8_t argc, char** argv)
 {
 	if(argc != 1) // number of arguments invalid?
 		return (char)(-EINVARG);
-	
+
 	if(Sampling_flag == 0)// There was no sampling in progress to be terminated
 	{
 		UART_puts("No sampling in progress.\n\r");
 		return 0;
-	}	
+	}
 	// Stop taking samples
 	stop_sampling();
 	Sampling_flag = 0;
-	
+
 	UART_puts("Sampling stopped.\n\r");
 //	UART_puts("Sampled values:\n\r");
 	return 0;
@@ -336,7 +338,7 @@ char st_cb(uint8_t argc, char** argv)
 					 is used 'WG OFF'
 ******************************************************************************/
 
-const Signal_t signal_list[] = 
+const Signal_t signal_list[] =
 {
 	{"sin", wavegen_sin},
 	{"tri", wavegen_tri},
@@ -351,10 +353,10 @@ char wg_cb(uint8_t argc, char** argv)
 	uint8_t retval = (char)(-EINVARG);
 	const Signal_t *signal_ptr = signal_list;
 	char str[40];
-	
+
 	if(argc > 3) // number of arguments invalid?
 		return (char)(-EINVARG);
-	
+
 	if(argc == 2)
 	{
 		// With 2 arguments, the only valid command is "WG OFF"
@@ -368,11 +370,11 @@ char wg_cb(uint8_t argc, char** argv)
 		// Else, invalid argument
 		return retval;
 	}
-	
+
 	freq = my_atoi(argv[2]);
 	if((freq == 0) || (freq > 100))
 		return (char)(-EINVARG);
-	
+
 	// check if given <signal> is valid
 	while(signal_ptr->name)
 	{
