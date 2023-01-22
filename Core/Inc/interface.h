@@ -19,5 +19,6 @@ extern char ra_cb(uint8_t argc, char** argv); // Analog Read Callback
 
 extern char help_cb(uint8_t argc, char** argv);
 extern char ver_cb(uint8_t argc, char** argv);
+extern char clear_cb(uint8_t argc, char** argv);
 
 #endif // !__INTERFACE_H__

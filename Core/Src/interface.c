@@ -43,6 +43,11 @@ char ver_cb(uint8_t argc, char** argv)
 	return 0;
 }
 
+char clear_cb(uint8_t argc, char** argv)
+{
+	UART_puts("\e[1;1H\e[2J");
+	return 0;
+}
 /******************************************************************************
 @function  Memory Read
 @usage		 MR <addr16> <length8>

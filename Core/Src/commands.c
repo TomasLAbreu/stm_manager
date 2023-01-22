@@ -30,6 +30,12 @@ const Command_t cmd_list[] =
 		ver_cb
 	},
 	{
+		"clear",
+		"Clear screen",
+		"",
+		clear_cb
+	},
+	{
 		"MR",
 		"Memory Read",
 		"MR <addr16> <length8>",
