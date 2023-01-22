@@ -118,7 +118,7 @@ $(BLD_DIR)/$(STARTUP).o: $(STARTUP).s
 $(TARGET).elf: $(LDSCRIPT) $(OBJS) $(BLD_DIR)/$(STARTUP).o
 	@echo "$(GREEN)Linking $@$(RESET)"
 	@$(CC) -o $@ -T $^ $(LDFLAGS)
-	@arm-none-eabi-size $(TARGET).elf
+# 	@arm-none-eabi-size $(TARGET).elf
 
 $(TARGET).bin: $(TARGET).elf
 	@echo "$(CYAN)Generating $@$(RESET)"
