@@ -116,9 +116,11 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  send_cmd("mr 0 16");
 
 	UART_putchar('>'); // print prompt
 	Rx_UART_init(); // set USART3 interrupt
+
 
 	while (1)
   {

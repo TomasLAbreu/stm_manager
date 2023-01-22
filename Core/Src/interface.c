@@ -13,12 +13,12 @@
 Private defines
 ******************************************************************************/
 // SRAM1: 0x20020000 - 0x2007BFFF (368kB)
+// read and write memory
 
-// read and write memory base pointer
-#define SRAM_BASE (uint8_t *)0x20060000
-
-// read and write memory top pointer
-#define SRAM_TOP  (uint8_t *)0x2006FFFF
+// base pointer
+#define SRAM_BASE (uint8_t *)(0x20060000)
+// top pointer
+#define SRAM_TOP  (uint8_t *)(0x2006FFFF)
 
 /******************************************************************************
 Function Helpers Prototypes
@@ -367,26 +367,41 @@ static char memory_read(uint16_t addr, uint8_t len)
 	uint8_t* memory_ptr = (SRAM_BASE + addr);
 
 	uint8_t i;
-	char str[42];	// Output message
+	char str[64];
 
 	// Check if memory_ptr won't go over memory top
 	if((memory_ptr + (len - 1)) > SRAM_TOP)
 		return (char)(-EINVARG);
 
+	UART_puts("\n\rMemory | Contents\n\r");
 	for (i = 0; i < len; i++, addr++, memory_ptr++)
 	{
-		// checks if (*memory_ptr) is a printable character
-		if(!IS_PRINTABLE(*memory_ptr))
+		// UART_putchar('k');
+		if((i % 8) == 0)
 		{
-			sprintf(str, "Memory [0x%04X]:     (0x%02X)\n\r", addr, (*memory_ptr));
-		}
-		// Character is printable
-		else
-		{
-			sprintf(str, "Memory [0x%04X]: '%c' (0x%02X)\n\r", addr, (*memory_ptr), (*memory_ptr));
+			snprintf(str, sizeof(str), "0x%04X | ", addr);
 		}
 
-		UART_puts(str);
+		if((i % 4) == 0)
+		{
+			snprintf(str, sizeof(str), "%s  %02X", str, (*memory_ptr));
+		}
+		else
+		{
+			snprintf(str, sizeof(str), "%s %02X", str, (*memory_ptr));
+		}
+
+		 // if((i != 0) & ((i % 8) == 0))
+		if((i == len-1))
+		{
+			snprintf(str, sizeof(str), "%s\n\r", str);
+			UART_puts(str);
+		}
+		else if((i != 0) && ((i % 7) == 0))
+		{
+			snprintf(str, sizeof(str), "%s\n\r", str);
+			UART_puts(str);
+		}
 	}
 
 	return 0;
