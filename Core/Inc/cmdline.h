@@ -18,6 +18,9 @@ Special Key Ascii Codes
 #define UP_ARROW_KEY    'A'
 #define DOWN_ARROW_KEY  'B'
 
+#define HOME_ARROW_KEY  'H'
+#define END_ARROW_KEY   'F'
+
 /******************************************************************************
 RX/TX Defines
 ******************************************************************************/
@@ -32,6 +35,7 @@ extern volatile uint8_t cmd_received;
 Function prototypes
 ******************************************************************************/
 
+extern void save_command(char *cmd);
 extern char UART_Receive(void);
 
 #endif // !__CMDLINE_H__

@@ -102,6 +102,7 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
+  // LED heart beat
   exec_cmd("MO 1 1");
   exec_cmd("SP s 1");
   exec_cmd("S");
@@ -125,10 +126,14 @@ int main(void)
   {
 		if(Rx_flag)
 		{
-			c = UART_Receive(); // Returns received char
+			c = UART_Receive();
+
+			// check if its not a special character
 			if(c != (char)(-1))
-				// Its not a special character
-				UART_putchar(c); // Received char is echoed
+      {
+				// char is echoed
+        UART_putchar(c);
+      }
 
 			Rx_flag = 0;
       Rx_UART_init();
@@ -136,13 +141,15 @@ int main(void)
 
 		if(cmd_received)
 		{
-		// 	if(exec_cmd(Rx_Buffer) == 0)// Is there an error?
-		// 		// No error. Command is valid
-		// 		strcpy(last_valid_cmd, Rx_Buffer); // Save this as last valid command
+			// if(exec_cmd(Rx_Buffer) == 0)// Is there an error?
+      {
+				// save valid command
+        save_command(Rx_Buffer);
+      }
 
-			UART_putchar('>');// print prompt
+      memset(Rx_Buffer, 0, RX_BUFF_LEN);
+			UART_putchar('>');
 			cmd_received = 0;
-			Rx_UART_init(); // >>>>>>> needed?? is inside UART_Receive
 		}
 
     /* USER CODE END WHILE */
