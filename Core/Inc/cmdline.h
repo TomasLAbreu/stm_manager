@@ -25,17 +25,18 @@ Special Key Ascii Codes
 RX/TX Defines
 ******************************************************************************/
 
-#define RX_BUFF_LEN 16
-
-extern char Rx_Buffer[RX_BUFF_LEN];
-extern volatile uint8_t Rx_index;
 extern volatile uint8_t cmd_received;
 
 /******************************************************************************
 Function prototypes
 ******************************************************************************/
 
-extern void save_command(char *cmd);
-extern char UART_Receive(void);
+extern void clear_cmd(void);
+
+extern char send_cmd(char *cmd);
+extern char recv_cmd(void);
+
+extern char exec_cmd(void);
+extern void save_cmd(void);
 
 #endif // !__CMDLINE_H__

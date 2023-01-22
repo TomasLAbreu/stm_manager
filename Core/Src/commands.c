@@ -126,41 +126,6 @@ const Command_t cmd_list[] =
 	},
 };
 
-char exec_cmd(const char *str)
-{
-	char err;
-
-	err = parse_cmd(cmd_list, str);
-
-	switch(err)
-	{
-		case (char)(-ECMDNF):
-			// No command found
-			UART_puts("Command [");
-			UART_puts(Rx_Buffer);
-			UART_puts("] not found.\n\r");
-			break;
-
-		case (char)(-EINVARG):
-			// Invalid Arguments
-			UART_puts("Invalid arguments.\n\r");
-			break;
-
-		case (char)(-ENOCMD):
-			// Command is empty
-		case (char)(-ENOMEM):
-			// Command list is empty
-		//case (char)(-ENOLIST):
-			// No memory available or bad allocation of memory
-			break;
-		case (char)(-EPERM):
-			UART_puts("No permission.\n\r");
-			break;
-	}
-
-	return err;
-}
-
 /******************************************************************************
 @function  Help
 @usage		 ?

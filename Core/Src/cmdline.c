@@ -4,17 +4,43 @@
 #include <string.h>
 #include <stdio.h>
 
-char Rx_Buffer[RX_BUFF_LEN];
-volatile uint8_t Rx_index = 0;
+#include "parser.h" // Using Command_t
+#include "commands.h"
+
+/******************************************************************************
+Public definitions
+******************************************************************************/
 
 volatile uint8_t cmd_received = 0;
 
 /******************************************************************************
-Function prototypes
+Private definitions
 ******************************************************************************/
 
-static void clear_last_cmd(void);
+#define RX_BUFF_LEN 16
+
+static char Rx_Buffer[RX_BUFF_LEN];
+volatile static uint8_t Rx_index = 0;
+
+#define MAX_SAVED_CMD 4
+
+static char saved_cmd_list[MAX_SAVED_CMD][RX_BUFF_LEN];
+static int saved_cmd_iter;
+static int num_saved_cmd = 0;
+
+/******************************************************************************
+Function helpers prototypes
+******************************************************************************/
 static void insert_cmd(const char* str);
+
+/******************************************************************************
+Key callbacks prototypes
+******************************************************************************/
+
+typedef struct Special_Key {
+  const uint8_t code;         // key ASCII code
+  char (*fn)(void);           // return 0 if callback was successful
+} Special_Key_t;
 
 static char enter_key_cb(void);
 static char bcksp_key_cb(void);
@@ -29,11 +55,6 @@ static char down_key_cb(void);
 
 static char end_key_cb(void);
 static char home_key_cb(void);
-
-typedef struct Special_Key {
-  const uint8_t code;         // key ASCII code
-  char (*fn)(void);           // return 0 if cb was successful
-} Special_Key_t;
 
 // List of special keys codes and callbacks
 const Special_Key_t s_key_list[] =
@@ -55,7 +76,91 @@ const Special_Key_t s_key_list[] =
   {0,0}
 };
 
-char UART_Receive(void)
+/******************************************************************************
+Key callbacks prototypes
+******************************************************************************/
+
+char send_cmd(char *cmd)
+{
+  char err = 0;
+  // char str[RX_BUFF_LEN+1];
+  // snprintf(str, sizeof(str), "%s\n", cmd);
+
+  insert_cmd(cmd);
+  err = exec_cmd();
+  clear_cmd();
+
+  return (char)(err);
+}
+
+/******************************************************************************
+Key callbacks prototypes
+******************************************************************************/
+
+char exec_cmd(void)
+{
+  char err = parse_cmd(cmd_list, Rx_Buffer);
+
+  switch(err)
+  {
+    case (char)(-ECMDNF):
+      // No command found
+      UART_puts("Command [");
+      UART_puts(Rx_Buffer);
+      UART_puts("] not found.\n\r");
+      break;
+
+    case (char)(-EINVARG):
+      // Invalid Arguments
+      UART_puts("Invalid arguments.\n\r");
+      break;
+
+    case (char)(-ENOCMD):
+      // Command is empty
+    case (char)(-ENOMEM):
+      // Command list is empty
+    //case (char)(-ENOLIST):
+      // No memory available or bad allocation of memory
+      break;
+    case (char)(-EPERM):
+      UART_puts("No permission.\n\r");
+      break;
+  }
+
+  return err;
+}
+
+/******************************************************************************
+Key callbacks prototypes
+******************************************************************************/
+
+void save_cmd(void)
+{
+  char *cmd = Rx_Buffer;
+
+  // on each new command, the saved_cmd_list must slide one cmd out
+  for(int i = MAX_SAVED_CMD-1; i > 0; i--)
+  {
+    strcpy(saved_cmd_list[i], saved_cmd_list[i-1]);
+  }
+
+  // save new command
+  strcpy(saved_cmd_list[0], cmd);
+  // when this is 0, no cmd should appear on the screen
+  saved_cmd_iter = 0;
+
+  // number of available saved commands
+  if(num_saved_cmd < MAX_SAVED_CMD)
+  {
+    num_saved_cmd++;
+  }
+}
+
+/******************************************************************************
+Key callbacks prototypes
+******************************************************************************/
+
+char recv_cmd(void)
 {
   const Special_Key_t *s_key_ptr = s_key_list;
   char c = UART_getchar();
@@ -66,6 +171,8 @@ char UART_Receive(void)
     // Treat as new command
     c = ENTER_KEY;
   }
+
+  Rx_UART_init();
 
   // Is the received char a control char?
   while(s_key_ptr->code)
@@ -87,82 +194,58 @@ char UART_Receive(void)
 
   return c;
 }
-/******************************************************************************
-@param     char received 'c' via UART
 
-@brief     process the char received as a special character
+/******************************************************************************
+Key callbacks prototypes
 ******************************************************************************/
 
-#define MAX_SAVED_CMD 4
-static char saved_cmd_list[MAX_SAVED_CMD][RX_BUFF_LEN];
-static int saved_cmd_iter;
-static int num_saved_cmd = 0;
-
-void save_command(char *cmd)
+static void insert_cmd(const char* str)
 {
-  // on each new command, the saved_cmd_list must slide one cmd out
-  for(int i = MAX_SAVED_CMD-1; i > 0; i--)
-  {
-    strcpy(saved_cmd_list[i], saved_cmd_list[i-1]);
-  }
+  if((str == NULL) || (str[0] == 0))
+    return;
 
-  // save new command
-  strcpy(saved_cmd_list[0], cmd);
-  // when this is 0, no cmd should appear on the screen
-  saved_cmd_iter = 0;
+  int len = strlen(str);
+  if(len > RX_BUFF_LEN)
+    return;
 
-  // number of available saved commands
-  if(num_saved_cmd < MAX_SAVED_CMD)
-  {
-    num_saved_cmd++;
-  }
-}
+  strcpy(Rx_Buffer, str);
+  Rx_index = strlen(str);
 
-static char up_key_cb(void)
-{
-  char can_move_cursor = ((saved_cmd_iter < MAX_SAVED_CMD) & (saved_cmd_iter < num_saved_cmd));
-
-  // check if there is an available saved cmd
-  if(can_move_cursor)
-  {
-    clear_last_cmd();
-    saved_cmd_iter++;
-    insert_cmd(saved_cmd_list[saved_cmd_iter-1]);
-  }
-
-  return !can_move_cursor;
-}
-
-static char down_key_cb(void)
-{
-  char can_move_cursor = (saved_cmd_iter > 1);
-
-  clear_last_cmd();
-
-  // check if there is a newer saved cmd to present
-  if(can_move_cursor)
-  {
-    saved_cmd_iter--;
-    insert_cmd(saved_cmd_list[saved_cmd_iter-1]);
-  }
-  // no cmd to present. Stop cycling through saved cmds
-  else
-  {
-    saved_cmd_iter = 0;
-  }
-
-  return !can_move_cursor;
+  // print cmd
+  UART_puts(str);
 }
 
 /******************************************************************************
-@param     char received 'c' via UART
-
-@brief     process the char received as a special character
+Key callbacks prototypes
 ******************************************************************************/
 
-char * get_command(void)
+void clear_cmd(void)
 {
-  return Rx_Buffer;
+  while(bcksp_key_cb() == 0)
+    ;
+
+  // Rx_Buffer[Rx_index] = 0;  // mark end of string
+  memset(Rx_Buffer, 0, RX_BUFF_LEN);
+}
+
+/******************************************************************************
+Key callbacks prototypes
+******************************************************************************/
+
+static char esc_key_cb(void)
+{
+  // this may be an escape code
+  // ....
+
+  return 0;
+}
+
+static char braket_key_cb(void)
+{
+  // this may be an escape code
+  // ....
+
+  return 0;
 }
 
 static char enter_key_cb(void)
@@ -189,24 +272,40 @@ static char bcksp_key_cb(void)
   return !can_move_cursor;
 }
 
-static char esc_key_cb(void)
+static char up_key_cb(void)
 {
-  // clear_last_cmd();
-  // HAL_UART_AbortReceive(&huart3);
-  // this may be an escape code
-  // ....
-  // UART_puts("esc_key_cb");
-  return 0;
+  char can_move_cursor = ((saved_cmd_iter < MAX_SAVED_CMD) & (saved_cmd_iter < num_saved_cmd));
+
+  // check if there is an available saved cmd
+  if(can_move_cursor)
+  {
+    clear_cmd();
+    saved_cmd_iter++;
+    insert_cmd(saved_cmd_list[saved_cmd_iter-1]);
+  }
+
+  return !can_move_cursor;
 }
 
-static char braket_key_cb(void)
+static char down_key_cb(void)
 {
-  // clear_last_cmd();
-  // HAL_UART_AbortReceive(&huart3);
-  // this may be an escape code
-  // ....
-  // UART_puts("braket_key_cb");
-  return 0;
+  char can_move_cursor = (saved_cmd_iter > 1);
+
+  clear_cmd();
+
+  // check if there is a newer saved cmd to present
+  if(can_move_cursor)
+  {
+    saved_cmd_iter--;
+    insert_cmd(saved_cmd_list[saved_cmd_iter-1]);
+  }
+  // no cmd to present. Stop cycling through saved cmds
+  else
+  {
+    saved_cmd_iter = 0;
+  }
+
+  return !can_move_cursor;
 }
 
 static char left_key_cb(void)
@@ -252,35 +351,4 @@ static char end_key_cb(void)
     ;
 
   return 0;
-}
-/******************************************************************************
-@brief     send backspaces via terminal to clear the command line
-******************************************************************************/
-static void clear_last_cmd(void)
-{
-  while(bcksp_key_cb() == 0)
-    ;
-
-  Rx_Buffer[Rx_index] = 0;  // mark end of string
-}
-
-/******************************************************************************
-@brief     Assigns 'Rx_Buffer' with string 'str', making 'Rx_index' point to
-              the end of 'Rx_Buffer'
-@param     String to be inserted in 'Rx_Buffer'
-******************************************************************************/
-static void insert_cmd(const char* str)
-{
-  if((str == NULL) || (str[0] == 0))
-    return;
-
-  int len = strlen(str);
-  if(len > RX_BUFF_LEN)
-    return;
-
-  strcpy(Rx_Buffer, str);
-  Rx_index = strlen(str);
-
-  // print cmd
-  UART_puts(str);
 }
