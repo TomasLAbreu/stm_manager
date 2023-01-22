@@ -103,13 +103,12 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // LED heart beat
-  send_cmd("MO 1 1");
-  send_cmd("SP s 1");
+  send_cmd("mo 1 1");
+  send_cmd("sp s 1");
   send_cmd("S");
-
   // print startup message
-  // UART_puts("\e[1;1H\e[2J");
-  // ver_cb(1, NULL);
+  send_cmd("clear");
+  // send_cmd("version");
   UART_puts("\n\rType '?' for list of available commands\n\r");
   // UART_puts("Type '? <cmd>' for more info on a given command\n\r");
 

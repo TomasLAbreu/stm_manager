@@ -1,12 +1,12 @@
 #include "parser.h"
+#include "errors.h"
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
-
 /*
 	Analyses the command sent in str_in and execute its callback
 */
-char parse_cmd(const Command_t cmd_list[], const char *str_in)
+char parser(const Command_t cmd_list[], const char *str_in)
 {
 	char **argv = NULL; // List of arguments
 	char *arg; // aux variable. Holds latest found argument

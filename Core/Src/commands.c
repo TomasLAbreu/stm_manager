@@ -1,5 +1,7 @@
 #include "commands.h"
 #include "usart.h"
+#include "errors.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -24,7 +26,7 @@ const Command_t cmd_list[] =
 		help_cb
 	},
 	{
-		"VER",
+		"version",
 		"Display firmware version",
 		"",
 		ver_cb
@@ -36,51 +38,51 @@ const Command_t cmd_list[] =
 		clear_cb
 	},
 	{
-		"MR",
+		"mr",
 		"Memory Read",
-		"MR <addr16> <length8>",
+		"mr <addr16> <length8>",
 		mr_cb
 	},
 	{
-		"MW",
+		"mw",
 		"Memory Write",
-		"MW <addr16> <length8> <byte8>",
+		"mw <addr16> <length8> <byte8>",
 		mw_cb
 	},
 	{
-		"MI",
+		"mi",
 		"Make Input",
-		"MI <port_addr8> <pin_setting16>",
+		"mi <port_addr8> <pin_setting16>",
 		mi_cb
 	},
 	{
-		"MO",
+		"mo",
 		"Make Output",
-		"MO <port_addr8> <pin_setting16>",
+		"mo <port_addr8> <pin_setting16>",
 		mo_cb
 	},
 	{
-		"RD",
+		"rd",
 		"Read Digital Pin",
-		"RD <port_addr8> <pin_setting16>",
+		"rd <port_addr8> <pin_setting16>",
 		rd_cb
 	},
 	{
-		"WD",
+		"wd",
 		"Write Digital Pin",
-		"WD <port_addr8> <pin_setting16> <pin_values8>",
+		"wd <port_addr8> <pin_setting16> <pin_values8>",
 		wd_cb
 	},
 	{
-		"RA",
+		"ra",
 		"Read Analog",
-		"RA <addr4>",
+		"ra <addr4>",
 		ra_cb
 	},
 	{
-		"SP",
+		"sp",
 		"Sampling Period",
-		"SP <timeScale> <timeVal>\n\r  <timeScale>: s - seconds; ms - milissecs.; micro - microsecs.\n\r  <timeVal>: hex value",
+		"sp <timeScale> <timeVal>\n\r  <timeScale>: s - seconds; ms - milissecs.; micro - microsecs.\n\r  <timeVal>: hex value",
 		sp_cb
 	},
 	// {

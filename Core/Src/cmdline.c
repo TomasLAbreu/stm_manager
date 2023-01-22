@@ -1,11 +1,12 @@
 #include "cmdline.h"
 #include "usart.h"
 #include "utils.h"
+#include "errors.h"
+#include "parser.h"
+#include "commands.h"
+
 #include <string.h>
 #include <stdio.h>
-
-#include "parser.h" // Using Command_t
-#include "commands.h"
 
 /******************************************************************************
 Public definitions
@@ -17,7 +18,7 @@ volatile uint8_t cmd_received = 0;
 Private definitions
 ******************************************************************************/
 
-#define RX_BUFF_LEN 16
+#define RX_BUFF_LEN   16
 
 static char Rx_Buffer[RX_BUFF_LEN];
 volatile static uint8_t Rx_index = 0;
@@ -27,6 +28,24 @@ volatile static uint8_t Rx_index = 0;
 static char saved_cmd_list[MAX_SAVED_CMD][RX_BUFF_LEN];
 static int saved_cmd_iter;
 static int num_saved_cmd = 0;
+
+/******************************************************************************
+Special Key Ascii Codes
+******************************************************************************/
+
+#define ENTER_KEY   0x0D
+#define BCKSP_KEY   0x7F
+#define ESC_KEY     0x1B
+#define BRAKET_KEY  0x5B
+#define DOLLAR_KEY  0x24
+
+#define LEFT_ARROW_KEY  'D'
+#define RIGHT_ARROW_KEY 'C'
+#define UP_ARROW_KEY    'A'
+#define DOWN_ARROW_KEY  'B'
+
+#define HOME_ARROW_KEY  'H'
+#define END_ARROW_KEY   'F'
 
 /******************************************************************************
 Function helpers prototypes
@@ -99,7 +118,7 @@ Key callbacks prototypes
 
 char exec_cmd(void)
 {
-  char err = parse_cmd(cmd_list, Rx_Buffer);
+  char err = parser(cmd_list, Rx_Buffer);
 
   switch(err)
   {
