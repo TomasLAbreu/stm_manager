@@ -52,7 +52,6 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-char last_valid_cmd[RX_BUFF_LEN] = {0};
 
 /* USER CODE END PV */
 
@@ -102,14 +101,14 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
+
   // LED heart beat
-  exec_cmd("MO 1 1");
-  exec_cmd("SP s 1");
-  exec_cmd("S");
-  // TIMER_6_Update(60000, 1800);
+  send_cmd("MO 1 1");
+  send_cmd("SP s 1");
+  send_cmd("S");
 
   // print startup message
-  UART_puts("\e[1;1H\e[2J");
+  // UART_puts("\e[1;1H\e[2J");
   // ver_cb(1, NULL);
   UART_puts("\n\rType '?' for list of available commands\n\r");
   // UART_puts("Type '? <cmd>' for more info on a given command\n\r");
@@ -126,7 +125,7 @@ int main(void)
   {
 		if(Rx_flag)
 		{
-			c = UART_Receive();
+			c = recv_cmd();
 
 			// check if its not a special character
 			if(c != (char)(-1))
@@ -136,18 +135,17 @@ int main(void)
       }
 
 			Rx_flag = 0;
-      Rx_UART_init();
 		}
 
 		if(cmd_received)
 		{
-			// if(exec_cmd(Rx_Buffer) == 0)// Is there an error?
+			if(exec_cmd() == 0)// Is there an error?
       {
 				// save valid command
-        save_command(Rx_Buffer);
+        save_cmd();
       }
 
-      memset(Rx_Buffer, 0, RX_BUFF_LEN);
+      clear_cmd();
 			UART_putchar('>');
 			cmd_received = 0;
 		}

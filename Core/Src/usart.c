@@ -174,6 +174,7 @@ void UART_putchar(char ch)
 							queued data
 @param  	 String to be transmitted
 ******************************************************************************/
+
 void UART_puts(const char *s)
 {
 	// check for empty string
