@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 /******************************************************************************
-@brief	Converts string 'str' to int, verifying if its ASCII values are valid 
+@brief	Converts string 'str' to int, verifying if its ASCII values are valid
 					(0-9 || A-F)
 @param  String 'str' to be converted
 
@@ -19,5 +19,7 @@ int my_atoi(const char *str)
 			return -1;		// invalid
 		i++;
 	}
-	return (int)strtol(str, NULL, 16); // convert string str (representing a hexadecimal value) into an integer number - 16 (hexadecimal)
+	// convert string str into an integer hex number
+	//return (int)strtol(str, NULL, 16);
+	return (int)strtol(str, NULL, 10);
 }

@@ -20,7 +20,7 @@
 const Command_t cmd_list[] =
 {
 	{
-		"?",
+		"help",
 		"Help information",
 		"Display extended information on a given command\n\r? <cmd>",
 		help_cb

@@ -22,7 +22,7 @@ Defines and Macros
 
 // Is true if __ch__ is a printable character
 // #define IS_PRINTABLE(__ch__) 	      (((__ch__) > 0x1F) && ((__ch__) < 0x7F))
-#define IS_PRINTABLE(__ch__)        ((((__ch__) > 0x1F) && ((__ch__) < 0x80)) || ((__ch__) == 0x0D))
+#define IS_PRINTABLE(__ch__)        (((__ch__) > 0x1F) && ((__ch__) < 0x7F))
 
 // Valid for [1 - 9]
 #define IS_DIG(__dig__)							(((uint8_t)(__dig__) > 0x00) && ((uint8_t)(__dig__) < 0x0A))

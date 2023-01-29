@@ -24,9 +24,6 @@ Private defines
 Function Helpers Prototypes
 ******************************************************************************/
 
-static char memory_read(uint16_t addr, uint8_t len);
-static char memory_write(uint16_t addr, uint8_t len, char byte);
-
 /******************************************************************************
 @function  Version
 @usage		 VER
@@ -58,7 +55,11 @@ char mr_cb(uint8_t argc, char** argv)
 {
 	uint32_t addr;
 	uint16_t len;
+	char str[64];
 
+	// add flags
+	// 	-b : select number of bytes to read (default)
+	//	-a : select initial addr and final addr
 	if(argc != 3)
 		return (char)(-EINVARG);
 
@@ -70,7 +71,68 @@ char mr_cb(uint8_t argc, char** argv)
 	if((len == 0) || (!IS_ADDR8(len)))
 		return (char)(-EINVARG);
 
-	return memory_read(addr, len);
+	uint8_t* mem_ptr = (SRAM_BASE + addr);
+
+	// Check if mem_ptr won't go over memory top
+	if((mem_ptr + (len - 1)) > SRAM_TOP)
+		return (char)(-EINVARG);
+
+	// print header
+	snprintf(str, sizeof(str),"Reading %0d bytes starting from %0ld\n\n\r", len, addr);
+	UART_puts(str);
+	UART_puts("  ADDR |   0  1  2  3   4  5  6  7  |   TEXT   |\n\r");
+	UART_puts("=======|============================|==========|\n\r");
+
+	uint8_t i, j;
+	char new_byte_str[8];
+
+	for (i = 0; i < len; i++, mem_ptr++)
+	{
+		// begin of the line
+		if((i % 8) == 0)
+		{
+			snprintf(str, sizeof(str), "0x%04lX | ", addr + i);
+			j = 0;
+		}
+
+		// in each 4 bytes print double spaces
+		snprintf(new_byte_str, sizeof(new_byte_str), " %02X", (*mem_ptr));
+
+		if(j == 4)
+		{
+			strcat(str, " ");
+		}
+
+		strcat(str, new_byte_str);
+
+		if(j == 7)
+		{
+			strcat(str, "  |");
+			for (j = 8; j > 0; j--)
+			{
+				char c = !IS_PRINTABLE(*(mem_ptr+1-j)) ? ' ' : (char)*(mem_ptr+1-j);
+				snprintf(new_byte_str, sizeof(new_byte_str), "%c", c);
+				strcat(str, new_byte_str);
+
+				if(j == 5)
+					strcat(str, "  ");
+			}
+			strcat(str, "|");
+			// j leaves this for loop with the same value as it entered
+			j = 7;
+		}
+
+		// is this the last byte? (of the line / of the entire read)
+		if((i == len-1) || (j == 7))
+		{
+			UART_puts(str);
+			UART_puts("\n\r");
+		}
+
+		j++;
+	}
+
+	return 0;
 }
 
 /******************************************************************************
@@ -79,6 +141,17 @@ char mr_cb(uint8_t argc, char** argv)
 
 @brief	 	 Write <byte>, starting on memory address <addr> for <lenght> positions
 ******************************************************************************/
+/*
+	> mw 0 "hello"
+
+	stores strlen("hello") bytes starting on address 0
+	OUTPUT:
+	String stored with %d bytes length
+
+	> mr 0 8 | exec
+
+	read command from addr 0 with 8 bytes length and execute it
+*/
 char mw_cb(uint8_t argc, char** argv)
 {
 	uint32_t addr;
@@ -100,7 +173,25 @@ char mw_cb(uint8_t argc, char** argv)
 	if(!IS_ADDR8(byte))
 		return (char)(-EINVARG);
 
-	return memory_write(addr, len, byte);
+	uint8_t* memory_ptr = (SRAM_BASE + addr);
+
+	// Check if memory_ptr won't go over memory top
+	if((memory_ptr + (len - 1)) > SRAM_TOP)
+		return (char)(-EINVARG);
+
+	uint8_t i;
+	char str[42];	// Output message
+
+	for (i = 0; i < len; i++, addr++, memory_ptr++)
+	{
+		// write memory pointed by memory_ptr
+		(*memory_ptr) = byte;
+
+		sprintf(str, "0x%04lX  successfully written.\n\r", addr);
+		UART_puts(str);
+	}
+	// return memory_write(addr, len, byte);
+	return 0;
 }
 
 /******************************************************************************
@@ -352,102 +443,3 @@ Function Helpers Implementation
 
 ******************************************************************************/
 
-
-/******************************************************************************
-@function  Memory Read
-@usage		 MR <addr16> <length8>
-@param  	 Base reading address
-@param  	 Number of addresses to be read
-
-@brief	 	 Read <length> memory positions, starting on <addr>
-******************************************************************************/
-static char memory_read(uint16_t addr, uint8_t len)
-{
-	// Start reading memory from SRAM_BASE. addr is used as offset
-	uint8_t* memory_ptr = (SRAM_BASE + addr);
-
-	uint8_t i;
-	char str[64];
-
-	// Check if memory_ptr won't go over memory top
-	if((memory_ptr + (len - 1)) > SRAM_TOP)
-		return (char)(-EINVARG);
-
-	UART_puts("\n\rMemory | Contents\n\r");
-	for (i = 0; i < len; i++, addr++, memory_ptr++)
-	{
-		// UART_putchar('k');
-		if((i % 8) == 0)
-		{
-			snprintf(str, sizeof(str), "0x%04X | ", addr);
-		}
-
-		if((i % 4) == 0)
-		{
-			snprintf(str, sizeof(str), "%s  %02X", str, (*memory_ptr));
-		}
-		else
-		{
-			snprintf(str, sizeof(str), "%s %02X", str, (*memory_ptr));
-		}
-
-		 // if((i != 0) & ((i % 8) == 0))
-		if((i == len-1))
-		{
-			snprintf(str, sizeof(str), "%s\n\r", str);
-			UART_puts(str);
-		}
-		else if((i != 0) && ((i % 7) == 0))
-		{
-			snprintf(str, sizeof(str), "%s\n\r", str);
-			UART_puts(str);
-		}
-	}
-
-	return 0;
-}
-
-/******************************************************************************
-@function  Memory Write
-@usage		 MW <addr16> <length8> <byte8>
-@param  	 Base writing address
-@param  	 Number of addresses to be written
-@param  	 Byte to be written
-
-@brief	 	 Write <byte>, starting on memory address <addr> for <lenght> positions
-******************************************************************************/
-static char memory_write(uint16_t addr, uint8_t len, char byte)
-{
-	// Start reading memory from SRAM_BASE. addr is used as offset
-	uint8_t* memory_ptr = (SRAM_BASE + addr);
-
-	uint8_t i;
-	char str[42];	// Output message
-
-	// Check if memory_ptr won't go over memory top
-	if((memory_ptr + (len - 1)) > SRAM_TOP)
-		return (char)(-EINVARG);
-
-	// checks if (byte) is a printable character
-	if(!IS_PRINTABLE(byte))
-	{
-		sprintf(str, "Byte 0x%02X:\n\r", byte);
-	}
-	// Character is printable
-	else
-	{
-		sprintf(str, "Byte '%c' [0x%02X]:\n\r", byte, byte);
-	}
-
-	UART_puts(str);
-	for (i = 0; i < len; i++, addr++, memory_ptr++)
-	{
-		// write memory pointed by memory_ptr
-		(*memory_ptr) = byte;
-
-		sprintf(str, "\tMemory [0x%04X] successfuly written.\n\r", addr);
-		UART_puts(str);
-	}
-
-	return 0;
-}
